@@ -9,23 +9,16 @@ class FinDePartie:
 
     def afficher(self):
         self.afficher_fond()
-        police = pygame.font.SysFont('arial', 30)
-        ligne1 = police.render(f"Perdu ! Votre score est {self.score}", True, (255, 255, 255))
-        self.ecran.blit(ligne1, (200, 300))
-        ligne2 = police.render("1. Rejouer", True, (255, 255, 255))
-        self.ecran.blit(ligne2, (200, 350))
-        ligne3 = police.render("2. Quitter", True, (255, 255, 255))
-        self.ecran.blit(ligne3, (200, 400))
         pygame.display.flip()
 
         attendre_entree = True
         while attendre_entree:
             for evenement in pygame.event.get():
                 if evenement.type == KEYDOWN:
-                    if evenement.key == K_1:
+                    if evenement.key == K_SPACE:
                         attendre_entree = False
                         self.rejouer()
-                    elif evenement.key == K_2:
+                    elif evenement.key == K_ESCAPE:
                         attendre_entree = False
                         self.quitter()
 
@@ -39,6 +32,6 @@ class FinDePartie:
         sys.exit()
 
     def afficher_fond(self):
-        fond = pygame.image.load("sources/background.jpg")
+        fond = pygame.image.load("sources/findepartie.png")
         self.ecran.blit(fond, (0, 0))
         pygame.display.flip()
