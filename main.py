@@ -140,10 +140,6 @@ class Jeu:
         pygame.mixer.music.pause()
         pygame.display.flip()
 
-    def jouer_son(self, nom_son):
-        # Ajouter ici la logique pour jouer le son correspondant au nom_son
-        pass
-
     def executer(self):
         en_cours = True
         pause = False
