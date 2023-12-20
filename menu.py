@@ -1,11 +1,11 @@
 import pygame
-import sys
+from pygame.locals import *
 
 BLEU_TURQUOISE_FONCE = (0, 102, 102)
 BLANC = (255, 255, 255)
 
-largeur_fenetre_accueil = 400
-hauteur_fenetre_accueil = 300
+largeur_fenetre_accueil = 1034
+hauteur_fenetre_accueil = 511
 
 pygame.init()
 
@@ -20,29 +20,24 @@ def afficher_texte(texte, x, y, couleur, surface):
     surface.blit(texte_surface, texte_rect)
 
 def afficher_accueil():
-    while True:
-        fenetre_accueil.fill(BLEU_TURQUOISE_FONCE)
+    # Mise en place fond d'écran
+    fond = pygame.image.load("sources/acceuil.png")
+    fenetre_accueil.blit(fond, (0, 0))
+    pygame.display.flip()
 
-        afficher_texte('Menu du Snake', largeur_fenetre_accueil // 2, hauteur_fenetre_accueil // 4, BLANC, fenetre_accueil)
-
-        pygame.draw.rect(fenetre_accueil, BLANC, (50, 150, 300, 50))
-        afficher_texte('Jouer', largeur_fenetre_accueil // 2, 175, BLEU_TURQUOISE_FONCE, fenetre_accueil)
-
-        pygame.display.flip()
-
+    # Attendre touche
+    attendre_entree = True
+    while attendre_entree:
         for evenement in pygame.event.get():
-            if evenement.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif evenement.type == pygame.MOUSEBUTTONDOWN and evenement.button == 1:
-                x, y = evenement.pos
-                if 50 <= x <= 350 and 150 <= y <= 200:
-                    return "jouer"
+            if evenement.type == KEYDOWN:
+                if evenement.key == K_KP_ENTER or evenement.key == K_RETURN:
+                    attendre_entree = False
+                    return True  # Retourner True si la touche Entrée est pressée
+
+    return False  # Retourner False si la fenêtre est fermée sans appuyer sur Entrée
 
 if __name__ == '__main__':
-    resultat = afficher_accueil()
-
-    if resultat == "jouer":
+    if afficher_accueil():
         from jeu import Jeu
         jeu = Jeu()
         jeu.executer()
