@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 import random
+from menu import *
 
 TAILLE = 40
 COULEUR_FOND = (110, 110, 5)
@@ -12,8 +13,7 @@ class Pomme:
     def __init__(self, ecran_parent):
         self.ecran_parent = ecran_parent
         self.image = pygame.image.load("sources/apple.png").convert()
-        self.x = 120
-        self.y = 120
+        self.bouger()
 
     def dessiner(self):
         self.ecran_parent.blit(self.image, (self.x, self.y))
@@ -32,19 +32,7 @@ class Serpent:
         self.x = [40]
         self.y = [40]
 
-    def deplacer_gauche(self):
-        self.direction = 'gauche'
-
-    def deplacer_droite(self):
-        self.direction = 'droite'
-
-    def deplacer_haut(self):
-        self.direction = 'haut'
-
-    def deplacer_bas(self):
-        self.direction = 'bas'
-
-    def marcher(self):
+    def deplacer(self):
         for i in range(self.longueur - 1, 0, -1):
             self.x[i] = self.x[i - 1]
             self.y[i] = self.y[i - 1]
@@ -80,14 +68,12 @@ class Jeu:
 
         self.ecran = pygame.display.set_mode((1000, 800))
         self.serpent = Serpent(self.ecran)
-        self.serpent.dessiner()
         self.pomme = Pomme(self.ecran)
-        self.pomme.dessiner()
         self.clock = pygame.time.Clock()  # Ajout de l'horloge
 
     def reinitialiser(self):
         self.serpent = Serpent(self.ecran)
-        self.pomme = Pomme(self.ecran)
+        self.pomme.bouger()
 
     def est_collision(self, x1, y1, x2, y2):
         return x2 <= x1 < x2 + TAILLE and y2 <= y1 < y2 + TAILLE
@@ -98,24 +84,21 @@ class Jeu:
 
     def jouer(self):
         self.afficher_fond()
-        self.serpent.marcher()
+        self.serpent.deplacer()
         self.pomme.dessiner()
         self.afficher_score()
         pygame.display.flip()
 
         for i in range(self.serpent.longueur):
             if self.est_collision(self.serpent.x[i], self.serpent.y[i], self.pomme.x, self.pomme.y):
-                self.jouer_son("ding")
                 self.serpent.augmenter_longueur()
                 self.pomme.bouger()
 
         for i in range(3, self.serpent.longueur):
             if self.est_collision(self.serpent.x[0], self.serpent.y[0], self.serpent.x[i], self.serpent.y[i]):
-                self.jouer_son('crash')
                 raise CollisionDetectedError("Collision détectée")
 
         if not (0 <= self.serpent.x[0] <= 1000 and 0 <= self.serpent.y[0] <= 800):
-            self.jouer_son('crash')
             raise CollisionDetectedError("Collision avec la limite détectée")
 
     def afficher_score(self):
@@ -124,14 +107,9 @@ class Jeu:
         self.ecran.blit(score, (850, 10))
 
     def afficher_game_over(self):
-        self.afficher_fond()
-        police = pygame.font.SysFont('arial', 30)
-        ligne1 = police.render(f"Perdu ! Votre score est {self.serpent.longueur}", True, (255, 255, 255))
-        self.ecran.blit(ligne1, (200, 300))
-        ligne2 = police.render("Appuyez sur Entrée pour revenir au menu.", True, (255, 255, 255))
-        self.ecran.blit(ligne2, (200, 350))
-        pygame.mixer.music.pause()
-        pygame.display.flip()
+        from fin_de_partie import FinDePartie
+        fin_partie = FinDePartie(self.serpent.longueur)
+        fin_partie.afficher()
 
         attendre_entree = True
         while attendre_entree:
@@ -152,17 +130,16 @@ class Jeu:
                     if evenement.key == K_ESCAPE:
                         en_cours = False
                     if evenement.key == K_RETURN:
-                        pygame.mixer.music.unpause()
                         pause = False
                     if not pause:
                         if evenement.key == K_LEFT:
-                            self.serpent.deplacer_gauche()
+                            self.serpent.direction = 'gauche'
                         if evenement.key == K_RIGHT:
-                            self.serpent.deplacer_droite()
+                            self.serpent.direction = 'droite'
                         if evenement.key == K_UP:
-                            self.serpent.deplacer_haut()
+                            self.serpent.direction = 'haut'
                         if evenement.key == K_DOWN:
-                            self.serpent.deplacer_bas()
+                            self.serpent.direction = 'bas'
                 elif evenement.type == QUIT:
                     en_cours = False
 
@@ -174,7 +151,7 @@ class Jeu:
                 pause = True
                 self.reinitialiser()
 
-            self.clock.tick(10)  # Limiter le taux de rafraîchissement
+            self.clock.tick(15)  # taux de rafraîchissement
 
 if __name__ == '__main__':
     jeu = Jeu()
