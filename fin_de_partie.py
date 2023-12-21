@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+Made in Marseille
+
+@author: Raphael
+"""
+# email : raphael.attias@laplateforme.io
+
 import pygame
 from pygame.locals import *
 import sys
@@ -25,6 +33,8 @@ class FinDePartie:
                     elif evenement.key == K_ESCAPE:
                         attendre_entree = False
                         self.quitter()
+                elif evenement.type == QUIT:
+                    en_cours = False  # Fermeture de la fenêtre
 
     def rejouer(self):
         from jeu import Jeu

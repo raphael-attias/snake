@@ -1,7 +1,16 @@
+# -*- coding: utf-8 -*-
+"""
+Made in Marseille
+
+@author: Raphael
+"""
+# email : raphael.attias@laplateforme.io
+
 import pygame
 from pygame.locals import *
 import random
 from menu import *
+import ctypes
 
 TAILLE = 40
 COULEUR_FOND = (110, 110, 5)
@@ -70,15 +79,24 @@ class Serpent:
 
 class Jeu:
     def __init__(self):
+        # Positionner la fenêtre en haut au milieu lors du lancement
+        hwnd = pygame.display.get_wm_info()["window"]
+        screen_info = pygame.display.Info()
+        largeur_ecran = screen_info.current_w
+        hauteur_ecran = screen_info.current_h
+        x = (largeur_ecran - 1000) // 2
+        y = 0
+        ctypes.windll.user32.SetWindowPos(hwnd, 0, x, y, 0, 0, 0x0001 | 0x0002)
+
+        # Initialisation de Pygame
         pygame.init()
         pygame.display.set_caption("Jeu Snake et Pomme")
 
-        pygame.mixer.init()
-
+        # Création de la fenêtre
         self.ecran = pygame.display.set_mode((1000, 800))
         self.serpent = Serpent(self.ecran)
         self.pomme = Pomme(self.ecran)
-        self.clock = pygame.time.Clock()  # Ajout de l'horloge
+        self.clock = pygame.time.Clock()
 
     def reinitialiser(self):
         self.serpent = Serpent(self.ecran)
