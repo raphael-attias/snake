@@ -28,6 +28,7 @@ class Serpent:
         self.ecran_parent = ecran_parent
         self.image = pygame.image.load("sources/block.jpg").convert()
         self.direction = 'bas'
+        self.direction_precedente = 'bas'  # propriété pour stocker la direction précédente
         self.longueur = 1
         self.x = [40]
         self.y = [40]
@@ -36,6 +37,13 @@ class Serpent:
         for i in range(self.longueur - 1, 0, -1):
             self.x[i] = self.x[i - 1]
             self.y[i] = self.y[i - 1]
+
+        # vérification pour éviter le demi-tour
+        if (self.direction == 'gauche' and self.direction_precedente == 'droite' or
+            self.direction == 'droite' and self.direction_precedente == 'gauche' or
+            self.direction == 'haut' and self.direction_precedente == 'bas' or
+            self.direction == 'bas' and self.direction_precedente == 'haut'):
+            self.direction = self.direction_precedente
 
         if self.direction == 'gauche':
             self.x[0] -= TAILLE
@@ -46,6 +54,7 @@ class Serpent:
         if self.direction == 'bas':
             self.y[0] += TAILLE
 
+        self.direction_precedente = self.direction
         self.dessiner()
 
     def dessiner(self):
@@ -75,7 +84,7 @@ class Jeu:
         self.serpent = Serpent(self.ecran)
         self.pomme.bouger()
 
-    def est_collision(self, x1, y1, x2, y2):
+    def collision(self, x1, y1, x2, y2):
         return x2 <= x1 < x2 + TAILLE and y2 <= y1 < y2 + TAILLE
 
     def afficher_fond(self):
@@ -90,12 +99,12 @@ class Jeu:
         pygame.display.flip()
 
         for i in range(self.serpent.longueur):
-            if self.est_collision(self.serpent.x[i], self.serpent.y[i], self.pomme.x, self.pomme.y):
+            if self.collision(self.serpent.x[i], self.serpent.y[i], self.pomme.x, self.pomme.y):
                 self.serpent.augmenter_longueur()
                 self.pomme.bouger()
 
         for i in range(3, self.serpent.longueur):
-            if self.est_collision(self.serpent.x[0], self.serpent.y[0], self.serpent.x[i], self.serpent.y[i]):
+            if self.collision(self.serpent.x[0], self.serpent.y[0], self.serpent.x[i], self.serpent.y[i]):
                 raise CollisionDetectedError("Collision détectée")
 
         if not (0 <= self.serpent.x[0] <= 1000 and 0 <= self.serpent.y[0] <= 800):
@@ -141,7 +150,7 @@ class Jeu:
                         if evenement.key == K_DOWN:
                             self.serpent.direction = 'bas'
                 elif evenement.type == QUIT:
-                    en_cours = False
+                    en_cours = False  # Fermeture de la fenêtre
 
             try:
                 if not pause:
@@ -151,7 +160,9 @@ class Jeu:
                 pause = True
                 self.reinitialiser()
 
-            self.clock.tick(15)  # taux de rafraîchissement
+            self.clock.tick(12) # taux de rafraîchissement
+
+        pygame.quit()  
 
 if __name__ == '__main__':
     jeu = Jeu()

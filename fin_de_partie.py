@@ -47,7 +47,7 @@ class FinDePartie:
         police = pygame.font.SysFont('arial', 30)
         y = 20  # Ajustez la position Y en conséquence
         for i, score in enumerate(self.scores[-3:]):
-            texte = police.render(f"Score précédent {i + 1} : {score}", True, (255, 255, 255))
+            texte = police.render(f"Score précédent : {score}", True, (0, 0, 0))
             self.ecran.blit(texte, (400, y))
             y += 40
 

@@ -33,7 +33,10 @@ def afficher_accueil():
                 if evenement.key == K_KP_ENTER or evenement.key == K_RETURN:
                     attendre_entree = False
                     return True  # Retourner True si la touche Entrée est pressée
-
+                
+            elif evenement.type == QUIT:
+                    en_cours = False  # Fermeture de la fenêtre
+                    
     return False  # Retourner False si la fenêtre est fermée sans appuyer sur Entrée
 
 if __name__ == '__main__':
